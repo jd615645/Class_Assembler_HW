@@ -8,7 +8,6 @@
 #include <sstream>
 #include <stdio.h> 
 #include <stdlib.h>
-#include <sstream>
 
 // std 為標準程式庫的名稱空間
 using namespace std;
@@ -26,7 +25,7 @@ std::string& trim(std::string &s) {
   return s;
 }
 // have ,X?
-int cheak_x(string str) {
+int check_x(string str) {
   if (str.find(",X") != -1) {
     return 1;
   }
@@ -35,7 +34,7 @@ int cheak_x(string str) {
   }
 }
 // have +?
-int cheak_plus(string str) {
+int check_plus(string str) {
   if (str.find("+") != -1) {  
     return 1;
   }
@@ -44,7 +43,7 @@ int cheak_plus(string str) {
   }
 }
 // have @?
-int cheak_at(string str) {
+int check_at(string str) {
   if (str.find("@") != -1) {
     return 1;
   }
@@ -53,7 +52,7 @@ int cheak_at(string str) {
   }
 }
 // have #?
-int cheak_sharp(string str) {
+int check_sharp(string str) {
   if (str.find("#") != -1) {
     return 1;
   }
@@ -225,20 +224,20 @@ int main(void) {
     int src_num = 0;
 
     // flag e
-    if(cheak_plus(line)) {
+    if(check_plus(line)) {
       flag[ln].e = 1;
     } 
     // flage n i 
-    if(cheak_sharp(line)) {
+    if(check_sharp(line)) {
       flag[ln].n = 0;
       flag[ln].i = 1;
     }
-    if(cheak_at(line)) {
+    if(check_at(line)) {
       flag[ln].n = 1;
       flag[ln].i = 0;
     }
     // flag x
-    if(cheak_x(line)) {
+    if(check_x(line)) {
       flag[ln].x = 1;
     }
 
