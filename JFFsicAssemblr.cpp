@@ -2,12 +2,10 @@
 #include <iostream>
 // 引入標準程式庫中相關的字串程式
 #include <iomanip>
+#include <map>
 #include <string>
 #include <fstream>
-#include <map>
-#include <sstream>
 #include <stdio.h> 
-#include <stdlib.h>
 
 // std 為標準程式庫的名稱空間
 using namespace std;
@@ -91,7 +89,7 @@ int dec2bin(int num) {
 int hex2dec(string num) {
   unsigned int x;   
   std::stringstream ss;
-  ss << std::hex << num;
+  ss << std::uppercase << std::hex << num;
   ss >> x;
   return static_cast<int>(x);
 }
@@ -309,12 +307,12 @@ int main(void) {
       std::string addzero(6 - code1_op.size(), '0');
       object_code[i] = code1_op + addzero;
     }
-    else if (code1 == "RESW" || code1 == "RESB" || code1 == "STAR" || code1 == "END") {
+    else if (code1 == "RESW" || code1 == "RESB" || code1 == "START" || code1 == "END") {
       object_code[i] = "";
     }
     else {
       std::stringstream stream;
-      stream << std::hex << address[code2];
+      stream << std::uppercase << std::hex << address[code2];
       std::string result(stream.str());
       object_code[i] = code1_op + result;
     }
@@ -328,8 +326,58 @@ int main(void) {
       }
     }
     // print sol
-    std::cout << std::hex << loc[i] << setw(10) << label << setw(10) << code1 << setw(10) << code2 << setw(10) << object_code[i] << std::endl;
+    std::cout << std::uppercase << std::hex << loc[i] << setw(10) << label << setw(10) << code1 << setw(10) << code2 << setw(10) << object_code[i] << std::endl;
   }
+
+  // 我只是分隔線 //
+  std::cout << "-----" << std::endl;
+
+  // 簡單的SIC組譯器
+  // 表頭記錄
+  std::cout << "H^" << src_code[0][0] << " 00" << std::uppercase << std::hex << loc[0] << "^00" << std::uppercase << std::hex << loc[ln]-loc[0] << std::endl;
+  // 本文記錄
+  /*
+    sic_run: 每行目的碼數目
+    ismax: 記錄目的碼的起始位址
+    stack_objcode: 目的碼
+  */
+  int sic_run = 0, ismax = 0;
+  string stack_objcode = "";
+  for (int i=1; i< ln; i++) {
+    if(sic_run == 0) {
+      stack_objcode = "";
+      std::cout << "T^00" << std::uppercase << std::hex << loc[i] << "^";
+      stack_objcode = stack_objcode + object_code[i] + "^";
+      ismax += 3;
+    }
+    else {
+      if (object_code[i] != "") {
+        if (src_code[i][1] == "BYTE") {
+          if(src_code[i][2] == "C'EOF'") {
+            stack_objcode += object_code[i] + "^";
+            ismax += 3;
+          }
+          else {
+            stack_objcode += src_code[i][2] + "^";
+            ismax += 1;
+          }
+        }
+        else {
+          stack_objcode += object_code[i] + "^";
+          ismax += 3;
+        }
+      }
+    }
+  
+    sic_run ++;
+    if(sic_run >= 10 || (i == ln-1)) {
+      std::cout << setw(2) << setfill('0') << std::uppercase << std::hex << ismax  << "^" << stack_objcode << std::endl;
+      sic_run = 0;
+      ismax = 0;
+    }
+  }
+  // 結束記錄
+  std::cout << "E^00" << std::uppercase << std::hex << loc[0] << std::endl;
 
   // close file
   file.close();
